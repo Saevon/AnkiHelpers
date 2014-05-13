@@ -12,19 +12,19 @@ if __name__ == '__main__':
     # First we need to read out whitelist
     whitelist = set()
     for kanji in Kanji.all():
-    	if not kanji.suspended:
-    		whitelist.add(kanji.kanji)
+        if not kanji.suspended:
+            whitelist.add(kanji.kanji)
 
     # Now we filter out any KanjiWords that use other kanji
     for kanji_word in KanjiWord.all():
-    	if kanji_word.suspended:
-    		continue
+        if kanji_word.suspended:
+            continue
 
-    	fine = True
-    	for kanji in kanji_word.kanji:
-    		if kanji not in KanjiWord.KANA and kanji not in whitelist:
-    			fine = False
+        fine = True
+        for kanji in kanji_word.kanji:
+            if kanji not in KanjiWord.KANA and kanji not in whitelist:
+                fine = False
 
-    	if fine:
-    		kanji_word.mark_suspended(False)
+        if fine:
+            kanji_word.mark_suspended(False)
 
