@@ -3,6 +3,7 @@
 from anki import AnkiModel
 from HTMLParser import HTMLParser
 import json
+import sys
 
 
 class KanjiPart(dict):

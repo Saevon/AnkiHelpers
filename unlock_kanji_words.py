@@ -17,9 +17,6 @@ if __name__ == '__main__':
 
     # Now we filter out any KanjiWords that use other kanji
     for kanji_word in KanjiWord.all():
-        if kanji_word.suspended:
-            continue
-
         fine = True
         for kanji in kanji_word.kanji:
             if kanji not in KanjiWord.KANA and kanji not in whitelist:
