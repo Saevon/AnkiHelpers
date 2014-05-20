@@ -36,7 +36,7 @@ def load_anki_data(kanji_list):
         return ord(char) < 128
 
     known = set()
-    for row in c.execute('SELECT flds from notes WHERE tags LIKE "%kanji%" AND NOT tags LIKE "%kanji-word%" AND NOT tags LIKE "%missing-kanji%";'):
+    for row in c.execute('SELECT flds from notes JOIN cards ON cards.nid == notes.id WHERE cards.queue != -1 AND tags LIKE "%kanji%" AND NOT tags LIKE "%kanji-word%" AND NOT tags LIKE "%missing-kanji%";'):
         # The first field is the kanji itself
         known.add(row[0][0])
 
