@@ -4,6 +4,7 @@ from anki import AnkiModel
 from HTMLParser import HTMLParser
 import json
 import sys
+import os
 
 
 class KanjiPart(dict):
@@ -46,9 +47,6 @@ class KanjiWord(AnkiModel):
         # range(0x1B000, 0x1B0FF + 1),
     ])]
 
-    with open('complex.json', 'r') as fh:
-        exceptions = json.load(fh)
-
     # create a subclass and override the handler methods
     class KanjiParser(HTMLParser):
         def handle_data(self, data):
@@ -59,7 +57,6 @@ class KanjiWord(AnkiModel):
             self.feed(html)
             return self.parts
 
-
     def __init__(self, data):
         super(KanjiWord, self).__init__(data)
 
@@ -69,6 +66,17 @@ class KanjiWord(AnkiModel):
             sys.stderr.write(str(data))
             raise err
 
+    @staticmethod
+    def setup(path):
+        KanjiWord.COMPLEX_PATH = path
+
+        # Ensure the file exists, if not create it
+        if not os.path.isfile(KanjiWord.COMPLEX_PATH):
+            with open(KanjiWord.COMPLEX_PATH, 'w') as fh:
+                json.dump([], fh)
+
+        with open(KanjiWord.COMPLEX_PATH, 'r') as fh:
+            KanjiWord.exceptions = json.load(fh)
 
     def _load_kanji_readings(self):
 
@@ -169,10 +177,14 @@ class KanjiWord(AnkiModel):
 
     @staticmethod
     def add_exception(kanji):
-        KanjiWord.exceptions.append(kanji)
+        KanjiWord.exceptions.append(unicode(kanji))
 
         # Make sure it is a set, but json dumpable
         KanjiWord.exceptions = list(set(KanjiWord.exceptions))
 
-        with open('complex.json', 'w') as fh:
-            json.dump(KanjiWord.exceptions, fh)
+        data = json.dumps(KanjiWord.exceptions, ensure_ascii=False).encode('utf8')
+        with open(KanjiWord.COMPLEX_PATH , 'w') as fh:
+            fh.write(data)
+
+
+

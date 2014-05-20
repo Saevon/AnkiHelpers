@@ -13,7 +13,7 @@ class AnkiModel(object):
     FIELD_SEP = '\x1f'
 
     # Sub-Class Customizations
-    DATA_PATH = '/Users/serghei/Documents/Saves/Anki/Saevon/collection.anki2'
+    DATA_PATH = None
 
     FIELDS = tuple()
 
@@ -22,9 +22,16 @@ class AnkiModel(object):
 
     KEY = None
 
+    @staticmethod
+    def setup(path):
+        AnkiModel.DATA_PATH = path
+
     @classmethod
     @contextmanager
     def execute(cls):
+        if AnkiModel.DATA_PATH is None:
+            raise AnkiModel.Error('Database not setup')
+
         conn = sqlite3.connect(AnkiModel.DATA_PATH)
         cursor = conn.cursor()
 
@@ -97,10 +104,10 @@ class AnkiModel(object):
         '''
         Marks all of the Cards for this Note as Suspended (or not) depending on the boolean
         '''
-        # Now we get extra information about these cards
-        print 'UPDATE cards SET queue=cards.type WHERE nid=%s' % (
-            self.id,
-        )
+        # Don't change any cards which are already at the right status
+        if self.suspended == boolean:
+            return
+
         AnkiModel.update('UPDATE cards SET queue=cards.type WHERE nid=%s;' % (
             self.id,
         ))

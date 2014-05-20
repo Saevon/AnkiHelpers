@@ -1,3 +1,4 @@
 *.pyc
 known_*.html
 complex.json
+extra_dict.json

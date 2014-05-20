@@ -5,6 +5,8 @@ from models.kanji import Kanji
 from models.kanji_word import KanjiWord
 from utf8_helper import force_UTF8
 
+import settings
+
 
 if __name__ == '__main__':
     force_UTF8()
