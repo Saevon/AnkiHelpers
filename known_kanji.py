@@ -1,7 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from lxml import etree
-
 import settings
 import os
 import json
@@ -12,29 +10,49 @@ from models.kanji_word import KanjiWord
 from utf8_helper import force_UTF8
 
 
-def kanji(character):
-    elems = character.findall('.//literal')
-    if len(elems) == 0:
+def get_child(elem, tag):
+    if elem is None:
         return None
-    return elems[0].text
+
+    for child in elem:
+        if child.tag == tag:
+            return child
+    return None
+
+
+def kanji(character):
+    elem = get_child(character, 'literal')
+
+    if elem is None:
+        return None
+    return elem.text
 
 def grade(character):
-    elems = character.findall('.//grade')
-    if len(elems) == 0:
+    elem = get_child(character, 'misc')
+    elem = get_child(elem, 'grade')
+
+    if elem is None:
         return None
-    return int(elems[0].text)
+    return int(elem.text)
 
 def halpern(character):
-    elems = character.findall('.//dic_ref[@dr_type="halpern_kkld"]')
-    if len(elems) == 0:
+    elem = get_child(character, 'dic_number')
+    if elem is None:
         return None
-    return int(elems[0].text)
+
+    for child in elem:
+        if child.attrib['dr_type'] == "halpern_kkld":
+            return int(child.text)
+
+    return None
 
 def strokes(character):
-    elems = character.findall('.//stroke_count')
-    if len(elems) == 0:
+    elem = get_child(character, 'misc')
+    elem = get_child(elem, 'stroke_count')
+
+    if elem is None:
         return None
-    return int(elems[0].text)
+    return int(elem.text)
 
 
 def message(title, msg):
@@ -121,18 +139,31 @@ def load_anki_data(kanji_list):
     return known
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 import sys
 reload(sys)
 sys.setdefaultencoding("UTF-8")
 
-with open(settings.KANJI_DICT, 'r') as f:
-    tree = etree.parse(f)
 
+import xml.etree.ElementTree as etree
+tree = etree.parse(settings.KANJI_DICT)
 root = tree.getroot()
 
 
 # Filter out any useless tags keeping only the actual character list
 characters = [i for i in root if i.tag == 'character']
+
 
 char_map = {}
 
@@ -155,6 +186,21 @@ known = load_anki_data(char_map.keys())
 # Mark any kanji that are known
 for key, value in char_map.iteritems():
     char_map[key]['known'] = value['kanji'] in known
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 import cgi
