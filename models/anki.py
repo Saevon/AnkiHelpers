@@ -65,7 +65,7 @@ class AnkiModel(object):
         finder = cls.FINDER
 
         if cls.TYPE_ID is not None:
-            finder += ' AND mid = %s' % cls.TYPE_ID
+            finder += ' AND mid in (%s)' % ','.join(cls.TYPE_ID)
 
         for row in cls.select('SELECT id, flds, tags from notes WHERE %s;' % finder):
             kwargs = {}

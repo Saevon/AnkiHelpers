@@ -4,7 +4,7 @@ from anki import AnkiModel
 
 
 class Kanji(AnkiModel):
-    TYPE_ID = '1391635666513'
+    TYPE_ID = ['1391635666513']
     FIELDS = (
         'kanji',
         'readings',

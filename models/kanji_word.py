@@ -20,7 +20,7 @@ class KanjiPart(dict):
         return out
 
 class KanjiWord(AnkiModel):
-    TYPE_ID = '1392404679934'
+    TYPE_ID = ['1392404679934']
     FIELDS = (
         'kanji',
         'reading',
