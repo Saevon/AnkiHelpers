@@ -6,8 +6,10 @@ import json
 
 from models.kanji import Kanji
 from models.kanji_word import KanjiWord
+from models.counter import Counter
 
 from utf8_helper import force_UTF8
+from itertools import chain
 
 
 def get_child(elem, tag):
@@ -104,7 +106,7 @@ def load_anki_data(kanji_list):
 
     # Kanji words also get to add to the whitelist
     actual = set()
-    for word in KanjiWord.all():
+    for word in Counter.all() + KanjiWord.all():
         if word.suspended:
             continue
 
@@ -137,6 +139,7 @@ def load_anki_data(kanji_list):
     known = (expected | actual)
 
     return known
+
 
 
 
@@ -186,7 +189,6 @@ known = load_anki_data(char_map.keys())
 # Mark any kanji that are known
 for key, value in char_map.iteritems():
     char_map[key]['known'] = value['kanji'] in known
-
 
 
 
