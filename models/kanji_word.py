@@ -45,7 +45,11 @@ class KanjiWord(AnkiModel):
 
         # Super extra code-points, not necessary
         # range(0x1B000, 0x1B0FF + 1),
-    ])]
+
+        # Other characters which count, ascii ++
+    ])] + [
+        u'〜',
+    ]
 
     # create a subclass and override the handler methods
     class KanjiParser(HTMLParser):
