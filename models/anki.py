@@ -84,7 +84,7 @@ class AnkiModel(object):
 
             # Now actually parse the fields
             for field in cls.FIELDS:
-                kwargs[field] = fields.pop(0)
+                kwargs[field] = unicode(fields.pop(0))
 
             obj = cls(kwargs)
             cls._cards.append(obj)

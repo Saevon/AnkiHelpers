@@ -66,9 +66,10 @@ class KanjiWord(AnkiModel):
 
         try:
             self._load_kanji_readings()
-        except Exception as err:
+        except Exception:
             sys.stderr.write(str(data))
-            raise err
+            sys.stderr.write('\n')
+            raise
 
     @staticmethod
     def setup(path):
@@ -83,11 +84,10 @@ class KanjiWord(AnkiModel):
             KanjiWord.exceptions = json.load(fh)
 
     def _load_kanji_readings(self):
-
         self.kanji_readings = []
 
         # Group up the readings field
-        readings = KanjiWord.KanjiParser().read_parts(self.reading)
+        readings = [unicode(val) for val in KanjiWord.KanjiParser().read_parts(self.reading)]
         self.reading = ''.join(readings)
 
         readings = readings
@@ -123,15 +123,17 @@ class KanjiWord(AnkiModel):
             return
         elif len(bases) != len(readings):
             # Then this is fucked up  beyond our current capability
-            inp = raw_input("Is this a complex reading? %s(%s): " % (
-                self.kanji, ''.join(readings),
-            ))
+            print(u"Is this a complex reading? %s(%s): " % (
+                self.kanji,
+                ''.join(readings),
+            )),
+            inp = raw_input()
             if inp == 'y':
                 KanjiWord.add_exception(self.kanji)
                 return
 
             raise AnkiModel.Error(u"Readings count(%s) doesn't match kanji(%s)" % (
-                bases, readings,
+                len(bases), readings,
             ))
 
         # Now map the readings to the kanji
