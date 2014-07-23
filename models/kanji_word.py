@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 from anki import AnkiModel
+from kanji import Kanji
 from HTMLParser import HTMLParser
 import json
 import sys
@@ -30,8 +31,7 @@ class KanjiWord(AnkiModel):
 
     KEY = 'kanji'
 
-    # ／
-    SEP = u'\uff0f'
+    SEP = Kanji.SEP
 
     KANA = [unichr(char) for char in reduce(lambda a, b: a + b, [
         # Katakana: http://en.wikipedia.org/wiki/Katakana
@@ -114,13 +114,13 @@ class KanjiWord(AnkiModel):
                 break
 
         # If the two don't match then there might be a problem
-        if len(bases) == 0:
+        if self.kanji in KanjiWord.exceptions:
+            return
+        elif len(bases) == 0:
             # Then the reading is either screwed up, or is a pure kana word (which shouldn't be a kanji-word)
             raise AnkiModel.Error(u"Reading is identical to Kanji: %s" % (
                 self.kanji
             ))
-        elif self.kanji in KanjiWord.exceptions:
-            return
         elif len(bases) != len(readings):
             # Then this is fucked up  beyond our current capability
             print(u"Is this a complex reading? %s(%s): " % (
@@ -146,7 +146,7 @@ class KanjiWord(AnkiModel):
         part = None
         out = []
         for kanji in string:
-            if kanji == KanjiWord.SEP:
+            if kanji in KanjiWord.SEP:
                 # For now we ignore things past the seperator for alternate readings
                 break
             elif kanji in KanjiWord.KANA:
