@@ -8,8 +8,23 @@ from utf8_helper import force_UTF8
 import settings
 
 
+def append_word(data, reading, kanji, word):
+    key = '%s-%s' % (kanji, reading)
+
+    if not data.get(key, False):
+        data[key] = {
+            'kanji': kanji,
+            'reading': reading,
+            'words': [],
+        }
+
+    data[key]['words'].append(word)
+
+
 if __name__ == '__main__':
     force_UTF8()
+
+    missing = {}
 
     # Now we need to find if all the readings are found
     for word in KanjiWord.all():
@@ -22,14 +37,20 @@ if __name__ == '__main__':
                         reading['base'], word.kanji, word.reading
                     ))
                 else:
-                    raise AnkiModel.Error(u"Kanji not found, but in use: %s word(%s)" % (
-                        reading['base'], word.kanji
-                    ))
+                    pass
+                    # raise AnkiModel.Error(u"Kanji not found, but in use: %s word(%s)" % (
+                    #     reading['base'], word.kanji
+                    # ))
             if reading['reading'] not in kanji.readings and kanji.kanji != '々':
-                print '%s(%s) word(%s)' % (
-                    kanji.kanji,
-                    reading['reading'],
-                    word.kanji,
-                )
+                append_word(missing, reading['reading'], kanji.kanji, word.kanji)
+
+    for key, data in missing.iteritems():
+        print '%s(%s) words(%s)' % (
+            data['kanji'],
+            data['reading'],
+            ', '.join(data['words']),
+        )
+
+
 
 
