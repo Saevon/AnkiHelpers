@@ -17,6 +17,44 @@ class PrintableList(list):
         out += ']'
         return out
 
+__by_vowels = {
+    u'ア': u'ワラヤャマハナタサカアァ',
+    u'イ': u'リミヒニちシキイィ',
+    u'ウ': u'ルユュムフヌツスクウゥ',
+    u'エ': u'レメヘネテセケエェ',
+    u'オ': u'ヲロヨョモホノトソコオォ',
+}
+
+__to_vowel = {}
+for vowel, letters in __by_vowels.iteritems():
+    for letter in letters:
+        __to_vowel[letter] = vowel
+
+from jcconv import kata2hira, hira2kata
+
+def char_to_base_vowel(char):
+    translated = __to_vowel.get(char, False) or __to_vowel.get(hira2kata(char), False)
+
+    if translated is False:
+        raise Exception("Can't convert")
+
+    return translated
+
+
+def all_to_hiragana(string):
+    out = u''
+
+    for index, char in enumerate(string):
+        if char == u'ー':
+            char = char_to_base_vowel(out[-1])
+
+        char = kata2hira(char)
+
+        out += char
+
+    return out
+
+
 
 class Reading(object):
 
@@ -56,7 +94,7 @@ class Reading(object):
 
 
         def handle_data(self, data):
-            self.reading.append(data, type=self._type)
+            self.reading.append(all_to_hiragana(data), type=self._type)
 
         def handle_endtag(self, tag):
             if tag != 'font':
