@@ -10,7 +10,7 @@ class AnkiModel(object):
     class Error(Exception):
         pass
 
-    FIELD_SEP = '\x1f'
+    FIELD_SEP = u'\x1f'
 
     # Sub-Class Customizations
     DATA_PATH = None

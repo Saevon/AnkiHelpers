@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 from anki import AnkiModel
-from reading import Reading
+from reading import Reading, PrintableList
 
 
 class Kanji(AnkiModel):
@@ -41,7 +41,7 @@ class Kanji(AnkiModel):
 
     @property
     def readings(self):
-        readings = []
+        readings = PrintableList()
 
         for reading in self._readings:
             readings += reading.get_all()

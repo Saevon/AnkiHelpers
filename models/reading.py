@@ -10,6 +10,13 @@ def tuple_to_dict(lst):
 
     return out
 
+class PrintableList(list):
+    def __str__(self):
+        out = '['
+        out += ', '.join(self)
+        out += ']'
+        return out
+
 
 class Reading(object):
 
@@ -135,7 +142,7 @@ class Reading(object):
         return out
 
     def get_all(self):
-        readings = []
+        readings = PrintableList()
 
         for part in self._parts:
             if part['type'] is None:
