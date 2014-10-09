@@ -1,8 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from anki import AnkiModel
 from kanji import Kanji
 from HTMLParser import HTMLParser
+import kana
+
+
 import json
 import sys
 import os
@@ -33,24 +36,6 @@ class KanjiWord(AnkiModel):
 
     SEP = Kanji.SEP
 
-    KANA = [unichr(char) for char in reduce(lambda a, b: a + b, [
-        # Katakana: http://en.wikipedia.org/wiki/Katakana
-        range(0x30A0, 0x30FF + 1),
-        range(0x31F0, 0x31FF + 1),
-        range(0x3200, 0x32FF + 1),
-        range(0xFF00, 0xFFEF + 1),
-
-        # Hiragana: http://en.wikipedia.org/wiki/Hiragana
-        range(0x3040, 0x309F + 1),
-
-        # Super extra code-points, not necessary
-        # range(0x1B000, 0x1B0FF + 1),
-
-        # Other characters which count, ascii ++
-    ])] + [
-        u'〜',
-    ]
-
     # create a subclass and override the handler methods
     class KanjiParser(HTMLParser):
         def handle_data(self, data):
@@ -71,23 +56,23 @@ class KanjiWord(AnkiModel):
             sys.stderr.write('\n')
             raise
 
-    @staticmethod
-    def setup(path):
-        KanjiWord.COMPLEX_PATH = path
+    @classmethod
+    def setup(cls, path):
+        cls.COMPLEX_PATH = path
 
         # Ensure the file exists, if not create it
-        if not os.path.isfile(KanjiWord.COMPLEX_PATH):
-            with open(KanjiWord.COMPLEX_PATH, 'w') as fh:
+        if not os.path.isfile(cls.COMPLEX_PATH):
+            with open(cls.COMPLEX_PATH, 'w') as fh:
                 json.dump([], fh)
 
-        with open(KanjiWord.COMPLEX_PATH, 'r') as fh:
-            KanjiWord.exceptions = json.load(fh)
+        with open(cls.COMPLEX_PATH, 'r') as fh:
+            cls.exceptions = json.load(fh)
 
     def _load_kanji_readings(self):
         self.kanji_readings = []
 
         # Group up the readings field
-        readings = [unicode(val) for val in KanjiWord.KanjiParser().read_parts(self.reading)]
+        readings = [kana.all_to_hiragana(unicode(val)) for val in KanjiWord.KanjiParser().read_parts(self.reading)]
         self.reading = ''.join(readings)
 
         readings = readings
@@ -145,11 +130,12 @@ class KanjiWord(AnkiModel):
         # Group up the kanji field
         part = None
         out = []
+
         for kanji in string:
             if kanji in KanjiWord.SEP:
                 # For now we ignore things past the seperator for alternate readings
                 break
-            elif kanji in KanjiWord.KANA:
+            elif kana.is_kana(kanji):
                 if part is None:
                     part = self._new_part(is_kanji=False)
                     part['is_kanji'] = False
@@ -165,6 +151,7 @@ class KanjiWord(AnkiModel):
                 part2 = self._new_part(is_kanji=True)
                 part2['base'] = kanji
                 out.append(part2)
+
         # Close any KANA parts left over
         if part is not None:
             out.append(part)

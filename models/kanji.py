@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from anki import AnkiModel
-from reading import Reading, PrintableList
+from models.anki import AnkiModel
+from models.reading import Reading, StringList
 
 
 class Kanji(AnkiModel):
@@ -20,6 +20,8 @@ class Kanji(AnkiModel):
         # ・
         u'\u30fb',
     ]
+
+
     def __init__(self, data):
         super(Kanji, self).__init__(data)
 
@@ -31,6 +33,7 @@ class Kanji(AnkiModel):
         self._readings = self._readings.split(Kanji.SEP[-1])
         self.init_readings()
 
+
     def init_readings(self):
         readings = []
 
@@ -41,12 +44,13 @@ class Kanji(AnkiModel):
 
     @property
     def readings(self):
-        readings = PrintableList()
+        readings = StringList()
 
         for reading in self._readings:
             readings += reading.get_all()
 
         return readings
+
 
 
 

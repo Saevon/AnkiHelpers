@@ -1,8 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 from contextlib import contextmanager
 import sqlite3
+from random import randrange
+from functools import wraps
 
 
 class AnkiModel(object):
@@ -22,9 +24,11 @@ class AnkiModel(object):
 
     KEY = None
 
-    @staticmethod
-    def setup(path):
-        AnkiModel.DATA_PATH = path
+    @classmethod
+    def setup(cls, **settings):
+        path = settings.get('path', None)
+        if path is not None:
+            cls.DATA_PATH = path
 
     @classmethod
     @contextmanager
@@ -125,8 +129,12 @@ class AnkiModel(object):
     ensuring = False
 
     @classmethod
-    def reload(cls):
+    def reload(cls, lazy=True):
         cls.loaded = False
+
+        # Make sure you can force the reload to happen right away
+        if not lazy:
+            cls.ensure_load()
 
     @classmethod
     def ensure_load(cls):
@@ -141,20 +149,36 @@ class AnkiModel(object):
 
             cls.loaded = True
 
+    def needs_loaded(func):
+        '''
+        Helper decorator, ensures the class is properly loaded before
+        the method is called (classmethods only).
+        '''
+        @wraps(func)
+        def wrapper(cls, *args, **kwargs):
+            cls.ensure_load()
+            return func(cls, *args, **kwargs)
+
+        return wrapper
+
+
     @classmethod
     def store(cls, key, val):
         cls._card_pk_map[key] = val
 
     @classmethod
+    @needs_loaded
     def find(cls, key):
-        cls.ensure_load()
-
         return cls._card_pk_map[unicode(key)]
 
     @classmethod
-    def get_id(cls, id):
-        cls.ensure_load()
+    @needs_loaded
+    def random(cls):
+        return cls._cards[randrange(0, len(cls._cards))]
 
+    @classmethod
+    @needs_loaded
+    def get_id(cls, id):
         return cls._cards_map[id]
 
     @classmethod
@@ -162,7 +186,7 @@ class AnkiModel(object):
         return list(cls.iter_all())
 
     @classmethod
+    @needs_loaded
     def iter_all(cls):
-        cls.ensure_load()
         for item in cls._cards:
             yield item

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import settings
 import os
@@ -8,8 +8,10 @@ from models.kanji import Kanji
 from models.kanji_word import KanjiWord
 from models.counter import Counter
 
+import kana
+import jlpt
+
 from utf8_helper import force_UTF8
-from itertools import chain
 
 
 def get_child(elem, tag):
@@ -22,7 +24,7 @@ def get_child(elem, tag):
     return None
 
 
-def kanji(character):
+def get_kanji(character):
     elem = get_child(character, 'literal')
 
     if elem is None:
@@ -113,7 +115,7 @@ def load_anki_data(kanji_list):
         # Add all the kanji in the word
         for kanji in word.kanji:
             # Make sure we only add kanji
-            if kanji in KanjiWord.KANA:
+            if kana.is_kana(kanji):
                 continue
 
             actual.add(kanji)
@@ -168,16 +170,20 @@ root = tree.getroot()
 characters = [i for i in root if i.tag == 'character']
 
 
+full_char_map = {}
 char_map = {}
 
 for char in characters:
     # http://www.csse.monash.edu.au/~jwb/kanjidic2/kd2examph.html
-    char_map[kanji(char)] = {
-        'kanji': kanji(char),
+    kanji = get_kanji(char)
+    char_map[kanji] = {
+        'kanji': kanji,
         'grade': grade(char),
         'halpern': halpern(char),
         'strokes': strokes(char),
+        'jlpt': jlpt.get_level(kanji)
     }
+    full_char_map[kanji] = char_map[kanji]
 
 # Filter out any characters without a halpern number
 for key, value in list(char_map.iteritems()):
@@ -187,8 +193,14 @@ for key, value in list(char_map.iteritems()):
 known = load_anki_data(char_map.keys())
 
 # Mark any kanji that are known
-for key, value in char_map.iteritems():
-    char_map[key]['known'] = value['kanji'] in known
+for key, value in full_char_map.iteritems():
+    full_char_map[key]['known'] = value['kanji'] in known
+
+
+
+
+
+
 
 
 
@@ -213,8 +225,9 @@ def make_char(char):
 
     data['kanji'] = cgi.escape(data['kanji']).encode('ascii', 'xmlcharrefreplace')
     data['halpern'] = data.get('halpern', 'none')
+    data['jlpt'] = '' if data['jlpt'] is None else 'jlpt-n' + str(data['jlpt'])
 
-    return '''<div class="kanji %(known)s grade-%(grade)s halpern-%(halpern)s">%(kanji)s</div>''' % data
+    return '''<div class="kanji %(known)s %(jlpt)s grade-%(grade)s halpern-%(halpern)s">%(kanji)s</div>''' % data
 
 def make_line(chars):
     return '''
@@ -283,7 +296,7 @@ data = '<html>'
 with open(settings.DATA_HEADER, 'r') as f:
     data = f.read()
 
-data += '<body>'
+data += '<body class="grade-colours">'
 for grade, kanji_list in grades.iteritems():
     data += '\n'
     data += group(kanji_list)
@@ -347,5 +360,38 @@ data += '</body>'
 data += '</html>'
 
 with open(os.path.join(settings.OUTPUT, 'known_kanji_halpern.html'), 'w') as f:
+    f.write(data);
+
+
+###########################################
+# Create the Kanji by JLPT list
+jlpt_kanji = {}
+for kanji in jlpt.get_all():
+    value = full_char_map[kanji]
+    level = value['jlpt']
+
+    # for inverse sorting
+    level = jlpt.MAX_LEVEL - level
+
+    val = jlpt_kanji.get(level, None)
+    if val is None:
+        jlpt_kanji[level] = []
+
+    jlpt_kanji[level].append(value)
+
+# Load up the html header
+data = '<html>'
+with open(settings.DATA_HEADER, 'r') as f:
+    data = f.read()
+
+data += '<body class="jlpt-colours">'
+for grade, kanji_list in jlpt_kanji.iteritems():
+    data += '\n'
+    data += group(kanji_list)
+data += '</body>'
+
+data += '</html>'
+
+with open(os.path.join(settings.OUTPUT, 'known_kanji_jlpt.html'), 'w') as f:
     f.write(data);
 
