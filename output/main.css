@@ -3,38 +3,8 @@ body {
 	zoom: 68%;
 }
 
-.grade-1 {
-	color: red;
-}
-.grade-2 {
-	color: orange;
-}
-.grade-3 {
-	color: #5DCEA8;
-}
-.grade-4 {
-	color: green;
-}
-.grade-5 {
-	color: #40A0E0;
-}
-.grade-6 {
-	color: blue;
-}
-
-.grade-8 {
-	color: black;
-}
-.grade-9 {
-	color: gray;
-}
-.grade-10 {
-	color: lightgray;
-}
-
-
 .kanji:not(.known) {
-	opacity: .1;
+	opacity: .3;
 }
 
 .kanji {
