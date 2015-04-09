@@ -78,6 +78,11 @@ class KanjiWord(AnkiModel):
         readings = readings
         bases = self.group_kana(self.kanji)
 
+        # Not all words are Kanji words
+        # (for Counter Support)
+        if len(readings) == 0:
+            return
+
         # Now we need to filter out the any bits that match from both
         right_pos = 0
         left_pos = 0
@@ -85,7 +90,7 @@ class KanjiWord(AnkiModel):
             right = bases[right_pos]['base']
             left = readings[left_pos]
 
-            if left == right:
+            if left == kana.all_to_hiragana(right):
                 bases.pop(right_pos)
                 readings.pop(left_pos)
             else:
@@ -178,6 +183,7 @@ class KanjiWord(AnkiModel):
         data = json.dumps(KanjiWord.exceptions, ensure_ascii=False).encode('utf8')
         with open(KanjiWord.COMPLEX_PATH , 'w') as fh:
             fh.write(data)
+
 
 
 

@@ -103,6 +103,10 @@ __HIRAGANA = (
     (0x1B000, 0x1B0FF + 1),
 )
 
+__KANJI = (
+    (0x4e00, 0x9faf + 1),
+)
+
 __BONUS_KANA = (
     u'〜',
 )
@@ -111,6 +115,7 @@ __BONUS_KANA = (
 KATAKANA = unipairs(__KATAKANA)
 HIRAGANA = unipairs(__HIRAGANA)
 KANA = PrintableList(KATAKANA + HIRAGANA + unipairs(__BONUS_KANA))
+KANJI = unipairs(__KANJI)
 
 
 
@@ -141,6 +146,14 @@ def is_kana(string):
             return False
     return True
 
+def __is_kanji(char):
+    return char in KANJI
+
+def is_kanji(string):
+    for char in string:
+        if not __is_kanji(char):
+            return False
+    return True
 
 def kana_minus_dakuten(char):
     if is_katakana(char):

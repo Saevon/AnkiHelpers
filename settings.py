@@ -18,6 +18,9 @@ DATA = 'data'
 # Path for the complex readings file
 COMPLEX_READINGS = 'complex.json'
 
+# Path for the ignore unused readings file
+UNUSED_READINGS = 'unused.json'
+
 # Path for the jlpt kanji file
 JLPT_PATH = 'jlpt_kanji.json'
 
@@ -38,9 +41,11 @@ EXTRA_DICT_KANJI = os.path.join(DATA, 'extra_dict.json')
 # Now we setup all the models
 from models.anki import AnkiModel
 from models.kanji_word import KanjiWord
+from models.kanji import Kanji
 
 AnkiModel.setup(path=os.path.join(ANKI_PATH, ANKI_USER, ANKI_DB))
 KanjiWord.setup(path=os.path.join(DATA, COMPLEX_READINGS))
+Kanji.setup(path=os.path.join(DATA, UNUSED_READINGS))
 
 import jlpt
 

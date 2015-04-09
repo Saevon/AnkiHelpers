@@ -77,6 +77,9 @@ class AnkiModel(object):
             kwargs['id'] = row[0]
             kwargs['suspended'] = False
 
+            # Properly parse the tags field
+            kwargs['tags'] = kwargs['tags'].split()
+
             # Now we need to parse the custom FIELDS
             fields = row[1].split(AnkiModel.FIELD_SEP)
 

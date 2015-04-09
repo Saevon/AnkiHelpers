@@ -62,13 +62,16 @@ def strokes(character):
 def message(title, msg):
     # required sudo gem install terminal-notifier
     # WARN: not safe yeat, should sanitize title, msg
-    import subprocess
 
     data = {
         'msg': msg,
         'title': title,
     }
 
+
+    # temporarily disabled
+    '''
+    import subprocess
     try:
         subprocess.call(
             u'terminal-notifier -message "%(msg)s" -title "%(title)s"' % data,
@@ -76,6 +79,7 @@ def message(title, msg):
         )
     except OSError as err:
         print err
+    '''
 
     # Make sure we print properly
     force_UTF8()
@@ -176,6 +180,7 @@ char_map = {}
 for char in characters:
     # http://www.csse.monash.edu.au/~jwb/kanjidic2/kd2examph.html
     kanji = get_kanji(char)
+
     char_map[kanji] = {
         'kanji': kanji,
         'grade': grade(char),
@@ -195,9 +200,6 @@ known = load_anki_data(char_map.keys())
 # Mark any kanji that are known
 for key, value in full_char_map.iteritems():
     full_char_map[key]['known'] = value['kanji'] in known
-
-
-
 
 
 
@@ -324,7 +326,7 @@ data = '<html>'
 with open(settings.DATA_HEADER, 'r') as f:
     data = f.read()
 
-data += '<body>'
+data += '<body class="jlpt-colours">'
 for count, kanji_list in strokes.iteritems():
     data += '\n'
     data += group(kanji_list)

@@ -12,6 +12,10 @@ body {
 	font-size: 150%;
 }
 
+.line {
+	display: inline;
+}
+
 .block {
 	float: left;
 	margin: 10px;
