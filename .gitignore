@@ -2,3 +2,5 @@
 known_*.html
 complex.json
 extra_dict.json
+
+.DS_Store
