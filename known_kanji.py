@@ -10,53 +10,10 @@ from models.counter import Counter
 
 import kana
 import jlpt
+import xml_helpers
 
 from utf8_helper import force_UTF8
 
-
-def get_child(elem, tag):
-    if elem is None:
-        return None
-
-    for child in elem:
-        if child.tag == tag:
-            return child
-    return None
-
-
-def get_kanji(character):
-    elem = get_child(character, 'literal')
-
-    if elem is None:
-        return None
-    return elem.text
-
-def grade(character):
-    elem = get_child(character, 'misc')
-    elem = get_child(elem, 'grade')
-
-    if elem is None:
-        return None
-    return int(elem.text)
-
-def halpern(character):
-    elem = get_child(character, 'dic_number')
-    if elem is None:
-        return None
-
-    for child in elem:
-        if child.attrib['dr_type'] == "halpern_kkld":
-            return int(child.text)
-
-    return None
-
-def strokes(character):
-    elem = get_child(character, 'misc')
-    elem = get_child(elem, 'stroke_count')
-
-    if elem is None:
-        return None
-    return int(elem.text)
 
 
 def message(title, msg):
@@ -159,7 +116,6 @@ def load_anki_data(kanji_list):
 
 
 
-
 import sys
 reload(sys)
 sys.setdefaultencoding("UTF-8")
@@ -179,13 +135,13 @@ char_map = {}
 
 for char in characters:
     # http://www.csse.monash.edu.au/~jwb/kanjidic2/kd2examph.html
-    kanji = get_kanji(char)
+    kanji = xml_helpers.get_kanji(char)
 
     char_map[kanji] = {
         'kanji': kanji,
-        'grade': grade(char),
-        'halpern': halpern(char),
-        'strokes': strokes(char),
+        'grade': xml_helpers.grade(char),
+        'halpern': xml_helpers.halpern(char),
+        'strokes': xml_helpers.strokes(char),
         'jlpt': jlpt.get_level(kanji)
     }
     full_char_map[kanji] = char_map[kanji]
