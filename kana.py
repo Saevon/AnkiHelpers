@@ -222,7 +222,7 @@ def all_to_hiragana(string):
     out = u''
 
     for index, char in enumerate(string):
-        if char == u'ー':
+        if char == u'ー' or char == u'｜':
             char = char_to_base_vowel(out[-1])
 
         char = kata2hira(char)
