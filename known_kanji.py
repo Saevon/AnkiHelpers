@@ -157,6 +157,17 @@ known = load_anki_data(char_map.keys())
 for key, value in full_char_map.iteritems():
     full_char_map[key]['known'] = value['kanji'] in known
 
+# Hide higher level kanji for now
+for key, value in list(char_map.iteritems()):
+    # Always show known kanji
+    if value['known']:
+        continue
+
+    # Filter out higher level ones for now
+    if value['grade'] is None:
+        char_map.pop(key)
+    elif value['grade'] >= 8 and value['jlpt'] is None:
+        char_map.pop(key)
 
 
 
@@ -274,6 +285,10 @@ for key, value in list(char_map.iteritems()):
     val = strokes.get(count, None)
     if val is None:
         strokes[count] = []
+
+    # ignore kanji that are too complicated for this list
+    if value['strokes'] >= 7:
+        continue
 
     strokes[count].append(value)
 
