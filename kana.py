@@ -40,6 +40,7 @@ __to_dakuten = PrintableDict(**{
 })
 
 __to_mini = PrintableDict(**{
+    u'く': u'っ',
     u'つ': u'っ',
     u'や': u'ゃ',
     u'よ': u'ょ',
@@ -58,6 +59,7 @@ __to_mini = PrintableDict(**{
 
 EXTENDABLE_MINIS = (
     u'つ',
+    u'く',
 )
 
 __by_dakuten = PrintableDict()
