@@ -27,6 +27,7 @@ JLPT_PATH = 'jlpt_kanji.json'
 # Path for Kanji dictionary
 FULL_KANJI_DICT = os.path.join(DATA, 'kanjidic2.xml')
 KANJI_DICT      = os.path.join(DATA, 'kanjidic2_common.xml')
+# KANJI_DICT = os.path.join(DATA, 'kanjidic2.xml')
 
 # Html Output templates
 DATA_HEADER = os.path.join(DATA, 'header.html')
